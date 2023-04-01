@@ -35,16 +35,18 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    return jsonify(data), 200
 
 ######################################################################
 # GET A PICTURE
 ######################################################################
-
-
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
+    for pic in data:
+        if pic.get("id") == id:
+            return jsonify(pic), 200
+    else:
+        return {"error": "pic not found"}, 404
 
 
 ######################################################################
@@ -52,20 +54,40 @@ def get_picture_by_id(id):
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    new_picture = request.json
+    new_id = new_picture.get("id")
+    if new_id in [pic.get("id") for pic in data]:
+        return {"Message": f"picture with id {new_id} already present"}, 302
+    data.append(new_picture)
+    return new_picture, 201
+    
 
 ######################################################################
 # UPDATE A PICTURE
 ######################################################################
-
-
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    new_pic = request.json
+    new_pic_id = new_pic.get("id")
+    for pic in data:
+        if pic.get("id") == new_pic_id:
+            pic.update(new_pic)
+            return new_pic, 200
+    else:
+        return {"message": "picture not found"}, 404
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    delete_index = None
+    for index, pic in enumerate(data):
+        
+        if pic.get("id") == id:
+            delete_index = index
+    if delete_index is not None:
+        data.pop(delete_index)
+        return {}, 204
+    return {"message": "picture not found"}, 404
+
